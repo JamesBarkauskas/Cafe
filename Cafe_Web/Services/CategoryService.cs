@@ -7,12 +7,12 @@ namespace Cafe_Web.Services
 {
     public class CategoryService : BaseService, ICategoryService
     {
-        private readonly IHttpClientFactory _httpClient;
-        private string cafeUrl;
+        //private readonly IHttpClientFactory _httpClient;
+        private string _cafeUrl;
         public CategoryService(IHttpClientFactory httpClientFactory, IConfiguration configuration) : base(httpClientFactory)
         {
-            _httpClient = httpClientFactory;
-            cafeUrl = configuration.GetValue<string>("ServiceUrls:CafeAPI");
+            //_httpClient = httpClientFactory;
+            _cafeUrl = configuration.GetValue<string>("ServiceUrls:CafeAPI");
         }
         public Task<T> CreateAsync<T>(CategoryCreateDTO dto)
         {
@@ -20,7 +20,7 @@ namespace Cafe_Web.Services
             {
                 ApiType = SD.ApiType.POST,
                 Data = dto,
-                Url = cafeUrl + "/api/categoryAPI"
+                Url = _cafeUrl + "/api/categoryAPI"
             });
         }
 
@@ -29,7 +29,7 @@ namespace Cafe_Web.Services
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.DELETE,
-                Url = cafeUrl + "/api/categoryAPI/" + id
+                Url = _cafeUrl + "/api/categoryAPI/" + id
             });
         }
 
@@ -38,7 +38,7 @@ namespace Cafe_Web.Services
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.GET,
-                Url = cafeUrl + "/api/categoryAPI"
+                Url = _cafeUrl + "/api/categoryAPI"
             });
         }
 
@@ -47,7 +47,7 @@ namespace Cafe_Web.Services
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.GET,
-                Url = cafeUrl + "/api/categoryAPI/" + id
+                Url = _cafeUrl + "/api/categoryAPI/" + id
             });
         }
 
@@ -57,7 +57,7 @@ namespace Cafe_Web.Services
             {
                 ApiType = SD.ApiType.PUT,
                 Data = dto,
-                Url = cafeUrl + "/api/categoryAPI/" + dto.Id
+                Url = _cafeUrl + "/api/categoryAPI/" + dto.Id
             });
         }
     }

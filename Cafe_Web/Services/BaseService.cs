@@ -55,6 +55,7 @@ namespace Cafe_Web.Services
 
                 // implement Token
 
+                // set debug here if get api error..
                 HttpResponseMessage responseMessage = await client.SendAsync(message);
                 var apiContent = await responseMessage.Content.ReadAsStringAsync();
                 try
