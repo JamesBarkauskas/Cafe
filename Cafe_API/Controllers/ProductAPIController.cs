@@ -88,11 +88,11 @@ namespace Cafe_API.Controllers
             return CreatedAtRoute("GetProduct", new { id = product.Id }, _response);
         }
 
-        [HttpPut]
+        [HttpPut("{id:int}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<APIResponse>> UpdateCategory(int id, [FromBody]ProductUpdateDTO productDto)
+        public async Task<ActionResult<APIResponse>> UpdateProduct(int id, [FromBody]ProductUpdateDTO productDto)
         {
             if (id == 0 || id != productDto.Id)
             {
@@ -108,20 +108,18 @@ namespace Cafe_API.Controllers
                 _response.StatusCode = HttpStatusCode.BadRequest;
                 return BadRequest(_response);
             }
-            //var prod = await _productRepo.GetAsync(u => u.Id == id);
-            //if (prod == null)
-            //{
-            //    _response.IsSuccess = false;
-            //    _response.Errors.Add("Product with id of " + id + " does not exist.");
-            //    _response.StatusCode = HttpStatusCode.NotFound;
-            //    return NotFound();
-            //}
 
-            Product product = _mapper.Map<Product>(productDto);
-            //prod.Name = product.Name;
-            //prod.Description = product.Description;
-            //prod.Price = product.Price;
-            //prod.Calories = product.Calories;
+            var product = await _productRepo.GetAsync(u=>u.Id==productDto.Id/*, tracked:false*/);
+            if (product == null)
+            {
+                _response.IsSuccess = false;
+                _response.Errors.Add("Product with id of " + id + " does not exist.");
+                _response.StatusCode = HttpStatusCode.NotFound;
+                return NotFound();
+            }
+            //product = _mapper.Map<Product>(productDto);
+            _mapper.Map(productDto,product);    // this approach avoids tracking errors..
+
             await _productRepo.UpdateAsync(product);
 
             _response.Result = productDto;
@@ -129,11 +127,11 @@ namespace Cafe_API.Controllers
             return Ok(_response);
         }
 
-        [HttpDelete]
+        [HttpDelete("{id:int}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<APIResponse>> DeleteCategory(int id)
+        public async Task<ActionResult<APIResponse>> DeleteProduct(int id)
         {
             if (id == 0)
             {
@@ -154,7 +152,7 @@ namespace Cafe_API.Controllers
             await _productRepo.RemoveAsync(product);
             _response.StatusCode = HttpStatusCode.NoContent;
             _response.Result = product;
-            return Ok(_response);
+            return NoContent();
         }
     }
 }
