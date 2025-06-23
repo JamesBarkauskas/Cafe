@@ -13,7 +13,7 @@ namespace Cafe_API.Controllers
     {
         private readonly ICategoryRepository _categoryRepo;
         protected APIResponse _response;
-        public CategoryAPIController(ICategoryRepository categoryRepo) 
+        public CategoryAPIController(ICategoryRepository categoryRepo)
         {
             _categoryRepo = categoryRepo;
             _response = new APIResponse();
@@ -30,13 +30,13 @@ namespace Cafe_API.Controllers
             return Ok(_response);
         }
 
-        [HttpGet("{id:int}", Name ="GetCategory")]
+        [HttpGet("{id:int}", Name = "GetCategory")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetCategory(int id)
         {
-            if (id==0)
+            if (id == 0)
             {
                 _response.IsSuccess = false;
                 _response.Errors.Add("No id of 0 exists.");
@@ -46,12 +46,12 @@ namespace Cafe_API.Controllers
             //var category = _db.Categories.FirstOrDefault(u => u.Id == id);  Find() is better here, more efficient..
             // Find() searches by PK, still returns null if not found (unlike First())
             var category = await _categoryRepo.GetAsync(u => u.Id == id);
-            if (category == null) 
+            if (category == null)
             {
                 _response.IsSuccess = false;
                 _response.Errors.Add("No id of " + id + " exists.");
                 _response.StatusCode = HttpStatusCode.NotFound;
-                return NotFound(_response); 
+                return NotFound(_response);
             }
             _response.Result = category;
             _response.StatusCode = HttpStatusCode.OK;
@@ -63,12 +63,12 @@ namespace Cafe_API.Controllers
         [ProducesResponseType(201)]
         public async Task<ActionResult<APIResponse>> CreateCategory([FromBody] Category category)
         {
-            if (category == null || category.Id != 0) 
+            if (category == null || category.Id != 0)
             {
                 _response.IsSuccess = false;
                 _response.Errors.Add("Category must be valid and id must be 0");
                 _response.StatusCode = HttpStatusCode.BadRequest;
-                return BadRequest(_response); 
+                return BadRequest(_response);
             }
             await _categoryRepo.CreateAsync(category);
             _response.StatusCode = HttpStatusCode.Created;
@@ -76,7 +76,7 @@ namespace Cafe_API.Controllers
             return CreatedAtRoute("GetCategory", new { id = category.Id }, _response);
         }
 
-        [HttpPut]
+        [HttpPut("{id:int}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -101,12 +101,12 @@ namespace Cafe_API.Controllers
             cat.Name = category.Name;
             await _categoryRepo.UpdateAsync(cat);
 
-            _response.Result = cat;
-            _response.StatusCode = HttpStatusCode.OK;
+            //_response.Result = cat;
+            _response.StatusCode = HttpStatusCode.NoContent;
             return Ok(_response);
         }
 
-        [HttpDelete]
+        [HttpDelete("{id:int}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]

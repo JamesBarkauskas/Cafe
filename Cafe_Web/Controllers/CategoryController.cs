@@ -44,7 +44,7 @@ namespace Cafe_Web.Controllers
                 var response = await _categoryService.CreateAsync<APIResponse>(category);
                 if (response != null && response.IsSuccess)
                 {
-                    TempData["success"] = "Category created";
+                    //TempData["success"] = "Category created";
                     return RedirectToAction(nameof(Index));
                 }
             }
@@ -52,6 +52,56 @@ namespace Cafe_Web.Controllers
             return View(category);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> UpdateCategory(int id)
+        {
+            var response = await _categoryService.GetAsync<APIResponse>(id);
+            if (response != null && response.IsSuccess)
+            {
+                var model = JsonConvert.DeserializeObject<CategoryUpdateDTO>(Convert.ToString(response.Result));
+                return View(model);
+            }
+            return NotFound();
+        }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateCategory(CategoryUpdateDTO dto)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await _categoryService.UpdateAsync<APIResponse>(dto);
+                if (response != null && response.IsSuccess)
+                {
+                    //TempData["success"] = "Category created";
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            //TempData["error"] = "Error encountered";
+            return View(dto);
+        }
+
+        public async Task<IActionResult> DeleteCategory(int id)
+        {
+            var response = await _categoryService.GetAsync<APIResponse>(id);
+            if (response != null && response.IsSuccess)
+            {
+                var model = JsonConvert.DeserializeObject<CategoryDTO>(Convert.ToString(response.Result));
+                return View(model);
+            }
+            return NotFound();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteCategory(CategoryDTO dto)
+        {
+            var response = await _categoryService.DeleteAsync<APIResponse>(dto.Id);
+            if (response != null && response.IsSuccess)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            return View(dto);
+        }
     }
 }
