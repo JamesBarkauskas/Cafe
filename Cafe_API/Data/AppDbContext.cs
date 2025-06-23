@@ -11,6 +11,7 @@ namespace Cafe_API.Data
         }
 
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Product> Products { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -19,6 +20,11 @@ namespace Cafe_API.Data
             modelBuilder.Entity<Category>().HasData(
                 new Category() { Id = 1, Name = "Food" },
                 new Category() { Id = 2, Name = "Drink" }
+                );
+
+            modelBuilder.Entity<Product>().HasData(
+                new Product() { Id = 1, Name = "Coffee", Calories = 0, Description = "Black coffee", Price = 1.99, CategoryId=2 },
+                new Product() { Id=2, Name="Iced Coffee", Calories=100, Description="Iced coffee with vanilla cream", Price=2.99, CategoryId=2}
                 );
         }
     }

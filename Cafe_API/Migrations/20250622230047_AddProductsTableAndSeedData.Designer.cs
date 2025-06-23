@@ -3,6 +3,7 @@ using Cafe_API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cafe_API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250622230047_AddProductsTableAndSeedData")]
+    partial class AddProductsTableAndSeedData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -61,9 +64,6 @@ namespace Cafe_API.Migrations
                     b.Property<int>("Calories")
                         .HasColumnType("int");
 
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -75,8 +75,6 @@ namespace Cafe_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
-
                     b.ToTable("Products");
 
                     b.HasData(
@@ -84,7 +82,6 @@ namespace Cafe_API.Migrations
                         {
                             Id = 1,
                             Calories = 0,
-                            CategoryId = 2,
                             Description = "Black coffee",
                             Name = "Coffee",
                             Price = 1.99
@@ -93,22 +90,10 @@ namespace Cafe_API.Migrations
                         {
                             Id = 2,
                             Calories = 100,
-                            CategoryId = 2,
                             Description = "Iced coffee with vanilla cream",
                             Name = "Iced Coffee",
                             Price = 2.9900000000000002
                         });
-                });
-
-            modelBuilder.Entity("Cafe_API.Models.Product", b =>
-                {
-                    b.HasOne("Cafe_API.Models.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
                 });
 #pragma warning restore 612, 618
         }
