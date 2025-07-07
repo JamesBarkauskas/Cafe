@@ -44,11 +44,11 @@ namespace Cafe_Web.Controllers
                 var response = await _categoryService.CreateAsync<APIResponse>(category);
                 if (response != null && response.IsSuccess)
                 {
-                    //TempData["success"] = "Category created";
+                    TempData["success"] = "Category created";
                     return RedirectToAction(nameof(Index));
                 }
             }
-            //TempData["error"] = "Error encountered";
+            TempData["error"] = "Error encountered";
             return View(category);
         }
 
