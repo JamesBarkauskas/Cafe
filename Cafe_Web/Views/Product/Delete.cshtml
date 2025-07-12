@@ -1,4 +1,5 @@
-﻿@model ProductDTO
+﻿@using Cafe_Web.Models.VM
+@model ProductDeleteVM
 
 @{
     ViewData["Title"] = "Delete Product";
@@ -7,35 +8,32 @@
 <h2>Delete Product</h2>
 
 <form asp-action="Delete" method="post">
-    <input hidden asp-for="Id" />
+    <input hidden asp-for="Product.Id" />
     <div class="form-group mb-3">
-        <label asp-for="Name" class="form-label"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+        <label asp-for="Product.Name" class="form-label"></label>
+        <input disabled asp-for="Product.Name" class="form-control" />
     </div>
 
     <div class="form-group mb-3">
-        <label asp-for="Description" class="form-label"></label>
-        <input asp-for="Description" class="form-control" />
-        <span asp-validation-for="Description" class="text-danger"></span>
+        <label asp-for="Product.Description" class="form-label"></label>
+        <input disabled asp-for="Product.Description" class="form-control" />
     </div>
 
     <div class="form-group mb-3">
-        <label asp-for="Price" class="form-label"></label>
-        <input asp-for="Price" class="form-control" />
-        <span asp-validation-for="Price" class="text-danger"></span>
+        <label asp-for="Product.Price" class="form-label"></label>
+        <input disabled asp-for="Product.Price" class="form-control" />
     </div>
 
     <div class="form-group mb-3">
-        <label asp-for="Calories" class="form-label"></label>
-        <input asp-for="Calories" class="form-control" />
-        <span asp-validation-for="Calories" class="text-danger"></span>
+        <label asp-for="Product.Calories" class="form-label"></label>
+        <input disabled asp-for="Product.Calories" class="form-control" />
     </div>
 
     <div class="form-group mb-3">
-        <label asp-for="CategoryId" class="form-label"></label>
-        <input asp-for="CategoryId" class="form-control" />
-        <span asp-validation-for="CategoryId" class="text-danger"></span>
+        <label asp-for="Product.CategoryId" class="form-label"></label>
+        <select disabled asp-for="Product.CategoryId" asp-items="@Model.CategoryList" class="form-select">
+            
+        </select>
     </div>
 
     <button type="submit" class="btn btn-danger">Delete</button>

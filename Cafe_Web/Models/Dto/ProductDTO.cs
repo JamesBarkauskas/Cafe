@@ -2,7 +2,7 @@
 
 namespace Cafe_Web.Models.Dto
 {
-    public class ProductDTO
+    public class ProductDTO // base dto used for viewing/returning data..
     {
         public int Id { get; set; }
         public string Name { get; set; }

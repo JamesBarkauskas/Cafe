@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Cafe_Web.Models;
 using Cafe_Web.Models.Dto;
+using Cafe_Web.Models.VM;
 using Cafe_Web.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using System.Reflection;
 
@@ -11,11 +13,13 @@ namespace Cafe_Web.Controllers
     public class ProductController : Controller
     {
         private readonly IProductService _productService;
+        private readonly ICategoryService _categoryService;
         private readonly IMapper _mapper;
-        public ProductController(IProductService productService, IMapper mapper)
+        public ProductController(IProductService productService, IMapper mapper, ICategoryService categoryService)
         {
             _productService = productService;
             _mapper = mapper;
+            _categoryService = categoryService;
         }
 
         public async Task<IActionResult> Index()
@@ -33,16 +37,28 @@ namespace Cafe_Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            return View();
+            ProductCreateVM productVM = new ProductCreateVM();
+            var response = await _categoryService.GetAllAsync<APIResponse>();
+            if (response != null && response.IsSuccess)
+            {
+                productVM.CategoryList = JsonConvert.DeserializeObject<List<CategoryDTO>>(
+                    Convert.ToString(response.Result)).Select(i => new SelectListItem
+                    {
+                        Text = i.Name,
+                        Value = i.Id.ToString()
+                    });
+            }
+
+            return View(productVM);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ProductCreateDTO dto)
+        public async Task<IActionResult> Create(ProductCreateVM model)
         {
             if (ModelState.IsValid)
             {
-                var response = await _productService.CreateAsync<APIResponse>(dto);
+                var response = await _productService.CreateAsync<APIResponse>(model.Product);
                 if (response != null && response.IsSuccess)
                 {
                     TempData["success"] = "Product created";
@@ -51,29 +67,47 @@ namespace Cafe_Web.Controllers
                 TempData["error"] = response.Errors.First();
              
             }
-            
-            return View(dto);
+            // if model not valid, repopulate the dropdown?
+            return View(model);
         }
 
         [HttpGet]
         public async Task<IActionResult> Update(int id)
         {
+            ProductUpdateVM productUpdateVM = new();
+
             var response = await _productService.GetAsync<APIResponse>(id);
             if (response != null && response.IsSuccess)
             {
-                ProductDTO model = JsonConvert.DeserializeObject<ProductDTO>(Convert.ToString(response.Result));
-                return View(_mapper.Map<ProductUpdateDTO>(model));
+                ProductUpdateDTO model = JsonConvert.DeserializeObject<ProductUpdateDTO>(Convert.ToString(response.Result));
+                productUpdateVM.Product = model;
+                //return View(model);
+                //return View(_mapper.Map<ProductUpdateDTO>(model));
             }
+
+            // populate dropdown
+            response = await _categoryService.GetAllAsync<APIResponse>();
+            if (response != null && response.IsSuccess)
+            {
+                productUpdateVM.CategoryList = JsonConvert.DeserializeObject<List<CategoryDTO>>(Convert.ToString(
+                    response.Result)).Select(i => new SelectListItem
+                    {
+                        Text = i.Name,
+                        Value = i.Id.ToString()
+                    });
+                return View(productUpdateVM);
+            }
+
             return NotFound();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(ProductUpdateDTO dto)
+        public async Task<IActionResult> Update(ProductUpdateVM model)
         {
             if (ModelState.IsValid)
             {
-                var response = await _productService.UpdateAsync<APIResponse>(dto);
+                var response = await _productService.UpdateAsync<APIResponse>(model.Product);
                 if (response != null && response.IsSuccess)
                 {
                     TempData["success"] = "Product updated";
@@ -81,33 +115,46 @@ namespace Cafe_Web.Controllers
                 }
                 TempData["error"] = response.Errors.First();
             }
-            return View(dto);
+            return View(model);
         }
 
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
+            ProductDeleteVM productDeleteVM = new();
             var response = await _productService.GetAsync<APIResponse>(id);
             if (response != null && response.IsSuccess)
             {
                 ProductDTO model = JsonConvert.DeserializeObject<ProductDTO>(Convert.ToString(response.Result));
-                return View(model);
+                productDeleteVM.Product = model;
             }
+            response = await _categoryService.GetAllAsync<APIResponse>();
+            if (response != null && response.IsSuccess)
+            {
+                productDeleteVM.CategoryList = JsonConvert.DeserializeObject<List<CategoryDTO>>(
+                    Convert.ToString(response.Result)).Select(i => new SelectListItem
+                    {
+                        Text = i.Name,
+                        Value = i.Id.ToString()
+                    });
+                return View(productDeleteVM);
+            }
+
             return NotFound();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(ProductDTO dto)
+        public async Task<IActionResult> Delete(ProductDeleteVM model)
         {
-            var response = await _productService.DeleteAsync<APIResponse>(dto.Id);
+            var response = await _productService.DeleteAsync<APIResponse>(model.Product.Id);
             if (response != null && response.IsSuccess)
             {
                 TempData["success"] = "Product deleted";
                 return RedirectToAction(nameof(Index));
             }
             TempData["error"] = "Error encountered";
-            return View(dto);
+            return View(model);
         }
     }
 }

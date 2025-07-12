@@ -152,7 +152,7 @@ namespace Cafe_API.Controllers
             await _productRepo.RemoveAsync(product);
             _response.StatusCode = HttpStatusCode.NoContent;
             _response.Result = product;
-            return NoContent();
+            return Ok(_response);
         }
     }
 }
