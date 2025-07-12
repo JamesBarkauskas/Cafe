@@ -1,21 +1,34 @@
+using AutoMapper;
 using Cafe_Web.Models;
+using Cafe_Web.Models.Dto;
+using Cafe_Web.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Diagnostics;
 
 namespace Cafe_Web.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly IProductService _productService;
+        private readonly IMapper _mapper;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(IProductService productService, IMapper mapper)
         {
-            _logger = logger;
+            _productService = productService;
+            _mapper = mapper;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            List<ProductDTO> products = new();
+            var response = await _productService.GetAllAsync<APIResponse>();
+            if (response != null)
+            {
+                products = JsonConvert.DeserializeObject<List<ProductDTO>>(Convert.ToString(response.Result));
+            }
+
+            return View(products);
         }
 
         public IActionResult Privacy()

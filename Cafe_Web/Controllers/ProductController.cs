@@ -16,11 +16,13 @@ namespace Cafe_Web.Controllers
         private readonly IProductService _productService;
         private readonly ICategoryService _categoryService;
         private readonly IMapper _mapper;
-        public ProductController(IProductService productService, IMapper mapper, ICategoryService categoryService)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public ProductController(IProductService productService, IMapper mapper, ICategoryService categoryService, IWebHostEnvironment webHostEnvironment)
         {
             _productService = productService;
             _mapper = mapper;
             _categoryService = categoryService;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public async Task<IActionResult> Index()
@@ -126,10 +128,37 @@ namespace Cafe_Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(ProductUpdateVM model)
+        public async Task<IActionResult> Update(ProductUpdateVM model, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
+                // set up image 
+                string wwwRootPath = _webHostEnvironment.WebRootPath;   // path to wwwroot folder
+                if (file != null)
+                {
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    string imgPath = Path.Combine(wwwRootPath, @"images/product");
+
+                    if (!string.IsNullOrEmpty(model.Product.ImageUrl))
+                    {
+                        // img already exists and udpate to new img..
+                        var oldImagePath = Path.Combine(wwwRootPath, model.Product.ImageUrl.TrimStart('\\'));
+                        if (System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
+                    }
+
+                    using (var fileStream = new FileStream(Path.Combine(imgPath, fileName), FileMode.Create))
+                    {
+                        file.CopyTo(fileStream);
+                    }
+                    model.Product.ImageUrl = @"\images\product\" + fileName;
+                }
+
+                // file is null
+
+
                 var response = await _productService.UpdateAsync<APIResponse>(model.Product);
                 if (response != null && response.IsSuccess)
                 {
