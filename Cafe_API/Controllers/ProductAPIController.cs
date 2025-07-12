@@ -66,6 +66,19 @@ namespace Cafe_API.Controllers
         [ProducesResponseType(201)]
         public async Task<ActionResult<APIResponse>> CreateProduct([FromBody] ProductCreateDTO productDto)
         {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+
+                _response.IsSuccess = false;
+                _response.Errors = errors;
+                _response.StatusCode = HttpStatusCode.BadRequest;
+                return BadRequest(_response);
+            }
+
             if (productDto == null)
             {
                 _response.IsSuccess = false;

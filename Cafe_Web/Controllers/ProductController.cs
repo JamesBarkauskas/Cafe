@@ -6,6 +6,7 @@ using Cafe_Web.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
+using System.Net;
 using System.Reflection;
 
 namespace Cafe_Web.Controllers
@@ -56,6 +57,20 @@ namespace Cafe_Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProductCreateVM model)
         {
+            if (!ModelState.IsValid)
+            {
+                APIResponse _response = new();
+                var errors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+
+                _response.IsSuccess = false;
+                _response.Errors = errors;
+                _response.StatusCode = HttpStatusCode.BadRequest;
+                return BadRequest(_response);
+            }
+
             if (ModelState.IsValid)
             {
                 var response = await _productService.CreateAsync<APIResponse>(model.Product);
@@ -67,7 +82,17 @@ namespace Cafe_Web.Controllers
                 TempData["error"] = response.Errors.First();
              
             }
-            // if model not valid, repopulate the dropdown?
+            // if model not valid, repopulate the dropdown
+            var res = await _categoryService.GetAllAsync<APIResponse>();
+            if (res != null && res.IsSuccess)
+            {
+                model.CategoryList = JsonConvert.DeserializeObject<List<CategoryDTO>>(Convert.ToString(
+                    res.Result)).Select(i => new SelectListItem
+                    {
+                        Text = i.Name,
+                        Value = i.Id.ToString()
+                    });
+            }
             return View(model);
         }
 
@@ -81,8 +106,6 @@ namespace Cafe_Web.Controllers
             {
                 ProductUpdateDTO model = JsonConvert.DeserializeObject<ProductUpdateDTO>(Convert.ToString(response.Result));
                 productUpdateVM.Product = model;
-                //return View(model);
-                //return View(_mapper.Map<ProductUpdateDTO>(model));
             }
 
             // populate dropdown
@@ -115,6 +138,17 @@ namespace Cafe_Web.Controllers
                 }
                 TempData["error"] = response.Errors.First();
             }
+            var res = await _categoryService.GetAllAsync<APIResponse>();
+            if (res != null && res.IsSuccess)
+            {
+                model.CategoryList = JsonConvert.DeserializeObject<List<CategoryDTO>>(Convert.ToString(
+                    res.Result)).Select(i => new SelectListItem
+                    {
+                        Text = i.Name,
+                        Value = i.Id.ToString()
+                    });
+            }
+
             return View(model);
         }
 
