@@ -60,6 +60,7 @@ namespace Cafe_API.Controllers
             }
 
             _response.StatusCode= System.Net.HttpStatusCode.OK;
+            _response.Result = user;
             return Ok(_response);
         }
     }

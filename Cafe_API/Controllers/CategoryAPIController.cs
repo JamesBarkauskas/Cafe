@@ -1,6 +1,7 @@
 ﻿using Cafe_API.Data;
 using Cafe_API.Models;
 using Cafe_API.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -9,6 +10,7 @@ namespace Cafe_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CategoryAPIController : ControllerBase
     {
         private readonly ICategoryRepository _categoryRepo;
