@@ -4,7 +4,7 @@ using Cafe_Web.Services.IServices;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
-
+// ** May be able to remove the 'AddScoped' line for each of the below.. so only include 'AddHttpClient' **
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddAutoMapper(typeof(MappingConfig));

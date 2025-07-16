@@ -29,7 +29,7 @@ namespace Cafe_Web.Services
         {
             return SendAsync<T>(new APIRequest()
             {
-                ApiType= SD.ApiType.POST,
+                ApiType= SD.ApiType.POST,   
                 Url = cafeUrl + "/api/user/register",
                 Data = obj
             });

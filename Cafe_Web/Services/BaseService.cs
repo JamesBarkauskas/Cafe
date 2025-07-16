@@ -15,6 +15,8 @@ namespace Cafe_Web.Services
         public BaseService(IHttpClientFactory httpClient)
         {
             //responseModel = new APIResponse();
+            // using httpClientfactory avoids socket exhaustion.. bc we not creating new clients each time,..?
+            // an httpClient is used to send http request and reciecve http responses from an api
             _httpClient = httpClient;
         }
 
@@ -33,7 +35,7 @@ namespace Cafe_Web.Services
                         Encoding.UTF8, "application/json");
                 }
 
-                // assign http verb..
+                // assign http verb..  // why use SD rather than just using HttpMethod.POST??
                 switch (request.ApiType)
                 {
                     case SD.ApiType.POST:

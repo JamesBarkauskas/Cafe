@@ -10,7 +10,7 @@ namespace Cafe_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class CategoryAPIController : ControllerBase
     {
         private readonly ICategoryRepository _categoryRepo;
@@ -63,6 +63,7 @@ namespace Cafe_API.Controllers
         [HttpPost]
         [ProducesResponseType(400)]
         [ProducesResponseType(201)]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult<APIResponse>> CreateCategory([FromBody] Category category)
         {
             if (category == null || category.Id != 0)
@@ -82,6 +83,7 @@ namespace Cafe_API.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult<APIResponse>> UpdateCategory(int id, [FromBody] Category category)
         {
             if (id == 0 || id != category.Id) 

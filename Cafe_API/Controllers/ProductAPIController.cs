@@ -2,6 +2,7 @@
 using Cafe_API.Models;
 using Cafe_API.Models.Dto;
 using Cafe_API.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -64,6 +65,7 @@ namespace Cafe_API.Controllers
         [HttpPost]
         [ProducesResponseType(400)]
         [ProducesResponseType(201)]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult<APIResponse>> CreateProduct([FromBody] ProductCreateDTO productDto)
         {
             if (!ModelState.IsValid)
@@ -105,6 +107,7 @@ namespace Cafe_API.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult<APIResponse>> UpdateProduct(int id, [FromBody]ProductUpdateDTO productDto)
         {
             if (id == 0 || id != productDto.Id)
