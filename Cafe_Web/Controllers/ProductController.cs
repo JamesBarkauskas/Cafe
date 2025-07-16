@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Cafe_Utility;
 using Cafe_Web.Models;
 using Cafe_Web.Models.Dto;
 using Cafe_Web.Models.VM;
@@ -28,7 +29,7 @@ namespace Cafe_Web.Controllers
         public async Task<IActionResult> Index()
         {
             List<Product> productList = new();
-            var response = await _productService.GetAllAsync<APIResponse>();
+            var response = await _productService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 productList = JsonConvert.DeserializeObject<List<Product>>(Convert.ToString(response.Result));
@@ -41,7 +42,7 @@ namespace Cafe_Web.Controllers
         public async Task<IActionResult> Create()
         {
             ProductCreateVM productVM = new ProductCreateVM();
-            var response = await _categoryService.GetAllAsync<APIResponse>();
+            var response = await _categoryService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 productVM.CategoryList = JsonConvert.DeserializeObject<List<CategoryDTO>>(
@@ -75,7 +76,7 @@ namespace Cafe_Web.Controllers
 
             if (ModelState.IsValid)
             {
-                var response = await _productService.CreateAsync<APIResponse>(model.Product);
+                var response = await _productService.CreateAsync<APIResponse>(model.Product, HttpContext.Session.GetString(SD.SessionToken));
                 if (response != null && response.IsSuccess)
                 {
                     TempData["success"] = "Product created";
@@ -85,7 +86,7 @@ namespace Cafe_Web.Controllers
              
             }
             // if model not valid, repopulate the dropdown
-            var res = await _categoryService.GetAllAsync<APIResponse>();
+            var res = await _categoryService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
             if (res != null && res.IsSuccess)
             {
                 model.CategoryList = JsonConvert.DeserializeObject<List<CategoryDTO>>(Convert.ToString(
@@ -103,7 +104,7 @@ namespace Cafe_Web.Controllers
         {
             ProductUpdateVM productUpdateVM = new();
 
-            var response = await _productService.GetAsync<APIResponse>(id);
+            var response = await _productService.GetAsync<APIResponse>(id, HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 ProductUpdateDTO model = JsonConvert.DeserializeObject<ProductUpdateDTO>(Convert.ToString(response.Result));
@@ -111,7 +112,7 @@ namespace Cafe_Web.Controllers
             }
 
             // populate dropdown
-            response = await _categoryService.GetAllAsync<APIResponse>();
+            response = await _categoryService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 productUpdateVM.CategoryList = JsonConvert.DeserializeObject<List<CategoryDTO>>(Convert.ToString(
@@ -159,7 +160,7 @@ namespace Cafe_Web.Controllers
                 // file is null
 
 
-                var response = await _productService.UpdateAsync<APIResponse>(model.Product);
+                var response = await _productService.UpdateAsync<APIResponse>(model.Product, HttpContext.Session.GetString(SD.SessionToken));
                 if (response != null && response.IsSuccess)
                 {
                     TempData["success"] = "Product updated";
@@ -167,7 +168,7 @@ namespace Cafe_Web.Controllers
                 }
                 TempData["error"] = response.Errors.First();
             }
-            var res = await _categoryService.GetAllAsync<APIResponse>();
+            var res = await _categoryService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
             if (res != null && res.IsSuccess)
             {
                 model.CategoryList = JsonConvert.DeserializeObject<List<CategoryDTO>>(Convert.ToString(
@@ -185,13 +186,13 @@ namespace Cafe_Web.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             ProductDeleteVM productDeleteVM = new();
-            var response = await _productService.GetAsync<APIResponse>(id);
+            var response = await _productService.GetAsync<APIResponse>(id, HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 ProductDTO model = JsonConvert.DeserializeObject<ProductDTO>(Convert.ToString(response.Result));
                 productDeleteVM.Product = model;
             }
-            response = await _categoryService.GetAllAsync<APIResponse>();
+            response = await _categoryService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 productDeleteVM.CategoryList = JsonConvert.DeserializeObject<List<CategoryDTO>>(
@@ -210,7 +211,7 @@ namespace Cafe_Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(ProductDeleteVM model)
         {
-            var response = await _productService.DeleteAsync<APIResponse>(model.Product.Id);
+            var response = await _productService.DeleteAsync<APIResponse>(model.Product.Id, HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 TempData["success"] = "Product deleted";

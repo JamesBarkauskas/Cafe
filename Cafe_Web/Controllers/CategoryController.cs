@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Cafe_Utility;
 using Cafe_Web.Models;
 using Cafe_Web.Models.Dto;
 using Cafe_Web.Services.IServices;
@@ -20,7 +21,7 @@ namespace Cafe_Web.Controllers
         public async Task<IActionResult> Index()
         {
             List<Category> categoryList = new();
-            var response = await _categoryService.GetAllAsync<APIResponse>();
+            var response = await _categoryService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 categoryList = JsonConvert.DeserializeObject<List<Category>>(Convert.ToString(response.Result));
@@ -41,7 +42,7 @@ namespace Cafe_Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var response = await _categoryService.CreateAsync<APIResponse>(category);
+                var response = await _categoryService.CreateAsync<APIResponse>(category, HttpContext.Session.GetString(SD.SessionToken));
                 if (response != null && response.IsSuccess)
                 {
                     TempData["success"] = "Category created";
@@ -55,7 +56,7 @@ namespace Cafe_Web.Controllers
         [HttpGet]
         public async Task<IActionResult> UpdateCategory(int id)
         {
-            var response = await _categoryService.GetAsync<APIResponse>(id);
+            var response = await _categoryService.GetAsync<APIResponse>(id, HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 var model = JsonConvert.DeserializeObject<CategoryUpdateDTO>(Convert.ToString(response.Result));
@@ -70,7 +71,7 @@ namespace Cafe_Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var response = await _categoryService.UpdateAsync<APIResponse>(dto);
+                var response = await _categoryService.UpdateAsync<APIResponse>(dto, HttpContext.Session.GetString(SD.SessionToken));
                 if (response != null && response.IsSuccess)
                 {
                     //TempData["success"] = "Category created";
@@ -83,7 +84,7 @@ namespace Cafe_Web.Controllers
 
         public async Task<IActionResult> DeleteCategory(int id)
         {
-            var response = await _categoryService.GetAsync<APIResponse>(id);
+            var response = await _categoryService.GetAsync<APIResponse>(id, HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 var model = JsonConvert.DeserializeObject<CategoryDTO>(Convert.ToString(response.Result));
@@ -96,7 +97,7 @@ namespace Cafe_Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteCategory(CategoryDTO dto)
         {
-            var response = await _categoryService.DeleteAsync<APIResponse>(dto.Id);
+            var response = await _categoryService.DeleteAsync<APIResponse>(dto.Id, HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 return RedirectToAction(nameof(Index));

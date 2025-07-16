@@ -19,11 +19,14 @@ namespace Cafe_API.Controllers
             this._response = new APIResponse();
         }
 
+        // ** add status codes to both methods **
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO loginRequestDTO)
         {
             var loginResponse = await _userRepo.Login(loginRequestDTO);
             // login not success..
+            // ** do i check if the response is null or resposne.user??? **
+            // ** set breakpoint and test... **
             if (loginResponse == null || string.IsNullOrEmpty(loginResponse.Token))
             {
                 _response.StatusCode = System.Net.HttpStatusCode.BadRequest;

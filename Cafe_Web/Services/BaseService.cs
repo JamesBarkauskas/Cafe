@@ -3,6 +3,7 @@ using Cafe_Web.Models;
 using Cafe_Web.Services.IServices;
 using Newtonsoft.Json;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Text;
 
 namespace Cafe_Web.Services
@@ -53,7 +54,11 @@ namespace Cafe_Web.Services
                 //HttpResponseMessage response = null;
                 //response = await client.SendAsync(message);
 
-                // implement Token
+                // check for Token
+                if (!string.IsNullOrEmpty(request.Token))
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", request.Token);
+                }
 
                 // set debug here if get api error..
                 HttpResponseMessage responseMessage = await client.SendAsync(message);

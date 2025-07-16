@@ -14,50 +14,55 @@ namespace Cafe_Web.Services
             //_httpClient = httpClientFactory;
             _cafeUrl = configuration.GetValue<string>("ServiceUrls:CafeAPI");
         }
-        public Task<T> CreateAsync<T>(CategoryCreateDTO dto)
+        public Task<T> CreateAsync<T>(CategoryCreateDTO dto, string token)
         {
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.POST,
                 Data = dto,
-                Url = _cafeUrl + "/api/categoryAPI"
+                Url = _cafeUrl + "/api/categoryAPI",
+                Token = token
             });
         }
 
-        public Task<T> DeleteAsync<T>(int id)
+        public Task<T> DeleteAsync<T>(int id, string token)
         {
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.DELETE,
-                Url = _cafeUrl + "/api/categoryAPI/" + id
+                Url = _cafeUrl + "/api/categoryAPI/" + id,
+                Token = token
             });
         }
 
-        public Task<T> GetAllAsync<T>()
+        public Task<T> GetAllAsync<T>(string token)
         {
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.GET,
-                Url = _cafeUrl + "/api/categoryAPI"
+                Url = _cafeUrl + "/api/categoryAPI",
+                Token = token
             });
         }
 
-        public Task<T> GetAsync<T>(int id)
+        public Task<T> GetAsync<T>(int id, string token)
         {
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.GET,
-                Url = _cafeUrl + "/api/categoryAPI/" + id
+                Url = _cafeUrl + "/api/categoryAPI/" + id,
+                Token = token
             });
         }
 
-        public Task<T> UpdateAsync<T>(CategoryUpdateDTO dto)
+        public Task<T> UpdateAsync<T>(CategoryUpdateDTO dto, string token)
         {
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.PUT,
                 Data = dto,
-                Url = _cafeUrl + "/api/categoryAPI/" + dto.Id
+                Url = _cafeUrl + "/api/categoryAPI/" + dto.Id,
+                Token = token
             });
         }
     }

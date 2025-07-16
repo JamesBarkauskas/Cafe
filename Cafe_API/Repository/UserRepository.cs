@@ -4,6 +4,7 @@ using Cafe_API.Models;
 using Cafe_API.Models.Dto;
 using Cafe_API.Repository.IRepository;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -11,6 +12,11 @@ using System.Text;
 
 namespace Cafe_API.Repository
 {
+    /* Consider moving methods into a UserService folder? Repos should only
+     * interact with the DB and contain
+     * basic CRUD operations like GetUser, CreateUser, UpdatePass... 
+     * repo should not hash passwords, validate credentials, generate jwt tokens. 
+     * Repos should 'talk to db and return data'.. nothing more.. */
     public class UserRepository : IUserRepository
     {
         private readonly AppDbContext _db;
@@ -25,15 +31,15 @@ namespace Cafe_API.Repository
 
         public bool IsUnique(string username)
         {
-            var name = _db.LocalUsers.FirstOrDefault(u=>u.UserName== username);
-            if (name == null) { return true; }
+            var user = _db.LocalUsers.FirstOrDefault(u=>u.UserName== username);
+            if (user == null) { return true; }
             return false;
         }
-
+      
         public async Task<LoginResponseDTO> Login(LoginRequestDTO loginRequestDTO)
         {
             var user = _db.LocalUsers.FirstOrDefault(u=>u.UserName== loginRequestDTO.UserName);
-            if (user.Password != loginRequestDTO.Password)
+            if (user == null || user.Password != loginRequestDTO.Password)
             {
                 return new LoginResponseDTO()
                 {
@@ -41,9 +47,9 @@ namespace Cafe_API.Repository
                     User = null
                 };
             }
-            // user exists,
+            // user exists and password is correct,
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(secretKey);   //convert key to bytes
+            var key = Encoding.ASCII.GetBytes(secretKey);   //convert key to bytes.. **use .UTF8 instead of ASCII
 
             // build out the token..
             var tokenDescriptor = new SecurityTokenDescriptor

@@ -1,4 +1,5 @@
 using AutoMapper;
+using Cafe_Utility;
 using Cafe_Web.Models;
 using Cafe_Web.Models.Dto;
 using Cafe_Web.Services.IServices;
@@ -22,7 +23,7 @@ namespace Cafe_Web.Controllers
         public async Task<IActionResult> Index()
         {
             List<ProductDTO> products = new();
-            var response = await _productService.GetAllAsync<APIResponse>();
+            var response = await _productService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
             if (response != null)
             {
                 products = JsonConvert.DeserializeObject<List<ProductDTO>>(Convert.ToString(response.Result));

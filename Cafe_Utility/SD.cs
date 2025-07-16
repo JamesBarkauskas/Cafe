@@ -12,5 +12,6 @@ namespace Cafe_Utility
         {
             GET, POST, PUT, DELETE
         }
+        public static string SessionToken = "JWTToken";
     }
 }
