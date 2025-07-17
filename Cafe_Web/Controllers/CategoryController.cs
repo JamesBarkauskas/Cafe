@@ -3,6 +3,7 @@ using Cafe_Utility;
 using Cafe_Web.Models;
 using Cafe_Web.Models.Dto;
 using Cafe_Web.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -31,6 +32,7 @@ namespace Cafe_Web.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> CreateCategory()
         {
             return View();
@@ -38,6 +40,7 @@ namespace Cafe_Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> CreateCategory(CategoryCreateDTO category)
         {
             if (ModelState.IsValid)
@@ -54,6 +57,7 @@ namespace Cafe_Web.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdateCategory(int id)
         {
             var response = await _categoryService.GetAsync<APIResponse>(id, HttpContext.Session.GetString(SD.SessionToken));
@@ -67,6 +71,7 @@ namespace Cafe_Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdateCategory(CategoryUpdateDTO dto)
         {
             if (ModelState.IsValid)
@@ -82,6 +87,8 @@ namespace Cafe_Web.Controllers
             return View(dto);
         }
 
+        [HttpGet]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
             var response = await _categoryService.GetAsync<APIResponse>(id, HttpContext.Session.GetString(SD.SessionToken));
@@ -95,6 +102,7 @@ namespace Cafe_Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles ="admin")]
         public async Task<IActionResult> DeleteCategory(CategoryDTO dto)
         {
             var response = await _categoryService.DeleteAsync<APIResponse>(dto.Id, HttpContext.Session.GetString(SD.SessionToken));

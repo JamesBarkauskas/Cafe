@@ -84,7 +84,8 @@ namespace Cafe_API.Repository
                 user.UserName = registerRequestDTO.UserName;
                 user.Password = registerRequestDTO.Password;
                 user.Name = registerRequestDTO.Name;
-                user.Role = registerRequestDTO.Role;
+                //user.Role = registerRequestDTO.Role;
+                user.Role = "customer";
 
                 _db.LocalUsers.Add(user);
                 await _db.SaveChangesAsync();

@@ -4,6 +4,7 @@ using Cafe_Web.Models;
 using Cafe_Web.Models.Dto;
 using Cafe_Web.Models.VM;
 using Cafe_Web.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
@@ -39,6 +40,7 @@ namespace Cafe_Web.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles ="admin")]
         public async Task<IActionResult> Create()
         {
             ProductCreateVM productVM = new ProductCreateVM();
@@ -58,6 +60,7 @@ namespace Cafe_Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Create(ProductCreateVM model)
         {
             if (!ModelState.IsValid)
@@ -100,6 +103,7 @@ namespace Cafe_Web.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Update(int id)
         {
             ProductUpdateVM productUpdateVM = new();
@@ -129,6 +133,7 @@ namespace Cafe_Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Update(ProductUpdateVM model, IFormFile? file)
         {
             if (ModelState.IsValid)
@@ -183,6 +188,7 @@ namespace Cafe_Web.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Delete(int id)
         {
             ProductDeleteVM productDeleteVM = new();
@@ -209,6 +215,7 @@ namespace Cafe_Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Delete(ProductDeleteVM model)
         {
             var response = await _productService.DeleteAsync<APIResponse>(model.Product.Id, HttpContext.Session.GetString(SD.SessionToken));
