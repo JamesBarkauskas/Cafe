@@ -164,7 +164,7 @@ namespace Cafe_Web.Controllers
 
                 // file is null
                 // grab the imgUrl if it exists..
-
+                
 
                 var response = await _productService.UpdateAsync<APIResponse>(model.Product, HttpContext.Session.GetString(SD.SessionToken));
                 if (response != null && response.IsSuccess)

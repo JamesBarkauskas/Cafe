@@ -50,11 +50,6 @@ namespace Cafe_Web.Controllers
                 // once signed in, retrieve token and store in user session
                 HttpContext.Session.SetString(SD.SessionToken, model.Token);
 
-                //foreach (var claim in principal.Claims)
-                //{
-                //    Console.WriteLine($"{claim.Type}: {claim.Value}");
-                //}
-
                 return RedirectToAction("Index", "Home");
 
             }
