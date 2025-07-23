@@ -11,6 +11,8 @@ namespace Cafe_API
             CreateMap<Product, ProductDTO>().ReverseMap();
             CreateMap<Product, ProductCreateDTO>().ReverseMap();
             CreateMap<Product, ProductUpdateDTO>().ReverseMap();
+
+            CreateMap<UserDTO, AppUser>().ReverseMap();
         }
     }
 }

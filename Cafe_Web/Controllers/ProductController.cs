@@ -40,7 +40,7 @@ namespace Cafe_Web.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles ="admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
         {
             ProductCreateVM productVM = new ProductCreateVM();
@@ -60,7 +60,7 @@ namespace Cafe_Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(ProductCreateVM model)
         {
             if (!ModelState.IsValid)
@@ -103,7 +103,7 @@ namespace Cafe_Web.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(int id)
         {
             ProductUpdateVM productUpdateVM = new();
@@ -133,7 +133,7 @@ namespace Cafe_Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(ProductUpdateVM model, IFormFile? file)
         {
             if (ModelState.IsValid)
@@ -163,6 +163,7 @@ namespace Cafe_Web.Controllers
                 }
 
                 // file is null
+                // grab the imgUrl if it exists..
 
 
                 var response = await _productService.UpdateAsync<APIResponse>(model.Product, HttpContext.Session.GetString(SD.SessionToken));
@@ -188,7 +189,7 @@ namespace Cafe_Web.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             ProductDeleteVM productDeleteVM = new();
@@ -215,7 +216,7 @@ namespace Cafe_Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(ProductDeleteVM model)
         {
             var response = await _productService.DeleteAsync<APIResponse>(model.Product.Id, HttpContext.Session.GetString(SD.SessionToken));

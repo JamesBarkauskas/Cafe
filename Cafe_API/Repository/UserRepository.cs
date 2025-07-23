@@ -4,6 +4,7 @@ using Cafe_API.Models;
 using Cafe_API.Models.Dto;
 using Cafe_API.Repository.IRepository;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -22,24 +23,32 @@ namespace Cafe_API.Repository
         private readonly AppDbContext _db;
         private readonly IMapper _mapper;
         private string secretKey;
-        public UserRepository(AppDbContext db, IMapper mapper, IConfiguration config) 
+        private readonly UserManager<AppUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        public UserRepository(AppDbContext db, IMapper mapper, IConfiguration config, UserManager<AppUser> userManager,
+            RoleManager<IdentityRole> roleManager) 
         {
             _db = db;
             _mapper = mapper;
             secretKey = config.GetValue<string>("ApiSettings:Secret");
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         public bool IsUnique(string username)
         {
-            var user = _db.LocalUsers.FirstOrDefault(u=>u.UserName== username);
+            var user = _db.AppUsers.FirstOrDefault(u=>u.UserName== username);
             if (user == null) { return true; }
             return false;
         }
       
         public async Task<LoginResponseDTO> Login(LoginRequestDTO loginRequestDTO)
         {
-            var user = _db.LocalUsers.FirstOrDefault(u=>u.UserName== loginRequestDTO.UserName);
-            if (user == null || user.Password != loginRequestDTO.Password)
+            //var user = _db.LocalUsers.FirstOrDefault(u=>u.UserName== loginRequestDTO.UserName);
+            var user = _db.AppUsers.FirstOrDefault(u=>u.UserName == loginRequestDTO.UserName);
+            // check password using userManager
+            bool isValid = await _userManager.CheckPasswordAsync(user, loginRequestDTO.Password);
+            if (user == null || isValid == false)
             {
                 return new LoginResponseDTO()
                 {
@@ -47,7 +56,11 @@ namespace Cafe_API.Repository
                     User = null
                 };
             }
+
+
             // user exists and password is correct,
+            var roles = await _userManager.GetRolesAsync(user);
+
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(secretKey);   //convert key to bytes.. **use .UTF8 instead of ASCII
 
@@ -56,8 +69,10 @@ namespace Cafe_API.Repository
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
+                    
                     new Claim(ClaimTypes.Name, user.UserName.ToString()),
-                    new Claim(ClaimTypes.Role, user.Role.ToString())
+                    new Claim(ClaimTypes.Role, roles.FirstOrDefault()),
+                    
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -69,28 +84,49 @@ namespace Cafe_API.Repository
             // build out the responseDTO (the return type..)
             LoginResponseDTO responseDTO = new LoginResponseDTO()
             {
-                User = user,
-                Token = tokenHandler.WriteToken(token)
+                User = _mapper.Map<UserDTO>(user),
+                Token = tokenHandler.WriteToken(token),
+                Role = roles.FirstOrDefault()
             };
             return responseDTO;
 
         }
 
-        public async Task<LocalUser> Register(RegistrationRequestDTO registerRequestDTO)
+        public async Task<UserDTO> Register(RegistrationRequestDTO registerRequestDTO)
         {
-            LocalUser user = new();
-            if (IsUnique(registerRequestDTO.UserName))
+            AppUser user = new()
             {
-                user.UserName = registerRequestDTO.UserName;
-                user.Password = registerRequestDTO.Password;
-                user.Name = registerRequestDTO.Name;
-                //user.Role = registerRequestDTO.Role;
-                user.Role = "customer";
+                UserName = registerRequestDTO.UserName,
+                Name = registerRequestDTO.Name,
+                NormalizedEmail = registerRequestDTO.UserName.ToUpper() + "@gmail.com",
+                Email = registerRequestDTO.UserName + "@gmail.com"
+            };
 
-                _db.LocalUsers.Add(user);
-                await _db.SaveChangesAsync();
+            try
+            {
+                var result = await _userManager.CreateAsync(user, registerRequestDTO.Password);
+                if (result.Succeeded)
+                {
+                    // check if roles exist.. wont exist first time so will only execute the first time..
+                    // 'hacky' way of adding roles, rather do it by seeding the db..
+                    //if (!_roleManager.RoleExistsAsync("admin").GetAwaiter().GetResult())
+                    //{
+                    //    await _roleManager.CreateAsync(new IdentityRole("admin"));
+                    //    await _roleManager.CreateAsync(new IdentityRole("customer"));
+                    //}
+
+                    await _userManager.AddToRoleAsync(user, "Customer");
+                    var userToReturn = _db.AppUsers.FirstOrDefault(u=>u.UserName== registerRequestDTO.UserName);
+                    return _mapper.Map<UserDTO>(userToReturn);
+                }
+
+                // todo: else - return error on register page..
             }
-            return user;
+            catch (Exception ex)
+            {
+
+            }
+            return new UserDTO();
         }
     }
 }

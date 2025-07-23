@@ -7,6 +7,6 @@ namespace Cafe_API.Repository.IRepository
     {
         bool IsUnique(string username);
         Task<LoginResponseDTO> Login(LoginRequestDTO loginRequestDTO);
-        Task<LocalUser> Register(RegistrationRequestDTO registerRequestDTO);
+        Task<UserDTO> Register(RegistrationRequestDTO registerRequestDTO);
     }
 }

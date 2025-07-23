@@ -1,8 +1,10 @@
 using Cafe_API;
 using Cafe_API.Data;
+using Cafe_API.Models;
 using Cafe_API.Repository;
 using Cafe_API.Repository.IRepository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -17,6 +19,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+// add Identity
+// says default user/role are appUser,identityRole.. then to add identity tables to our db
+builder.Services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>();
 
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(MappingConfig));
@@ -77,6 +83,13 @@ builder.Services.AddSwaggerGen(options=>
 });
 
 var app = builder.Build();
+
+// after building the app, but before running.. calll SeedData()
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await DbInitializer.SeedRolesAndAdminAsync(services);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
