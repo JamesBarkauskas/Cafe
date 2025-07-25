@@ -2,6 +2,7 @@
 using Cafe_API.Models;
 using Cafe_API.Repository.IRepository;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -63,7 +64,7 @@ namespace Cafe_API.Controllers
         [HttpPost]
         [ProducesResponseType(400)]
         [ProducesResponseType(201)]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<APIResponse>> CreateCategory([FromBody] Category category)
         {
             if (category == null || category.Id != 0)
@@ -83,7 +84,7 @@ namespace Cafe_API.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<APIResponse>> UpdateCategory(int id, [FromBody] Category category)
         {
             if (id == 0 || id != category.Id) 
@@ -114,6 +115,7 @@ namespace Cafe_API.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
+        [Authorize(Roles="Admin")]
         public async Task<ActionResult<APIResponse>> DeleteCategory(int id)
         {
             if (id == 0) 

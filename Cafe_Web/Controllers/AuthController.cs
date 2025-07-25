@@ -41,7 +41,7 @@ namespace Cafe_Web.Controllers
                 var handler = new JwtSecurityTokenHandler();
                 var jwt = handler.ReadJwtToken(model.Token);
 
-                var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
+                var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);   // same as doing 'new ClaimsIdentity("Cookies");
                 identity.AddClaim(new Claim(ClaimTypes.Name, jwt.Claims.FirstOrDefault(u=>u.Type == "unique_name").Value));
                 identity.AddClaim(new Claim(ClaimTypes.Role, jwt.Claims.FirstOrDefault(u=>u.Type=="role")?.Value));
                 var principal = new ClaimsPrincipal(identity);
@@ -74,7 +74,35 @@ namespace Cafe_Web.Controllers
             if (response != null)
             {
                 // ** TODO: have it sign user in and send them home page rather than making them sign in..
-                return RedirectToAction("Login");
+                var loginModel = new LoginRequestDTO
+                {
+                    UserName = model.UserName,
+                    Password = model.Password
+                };
+                APIResponse loginResponse = await _authService.LoginAsync<APIResponse>(loginModel);
+                if (loginResponse != null && loginResponse.IsSuccess)
+                {
+                    var loginResult = JsonConvert.DeserializeObject<LoginResponseDTO>(Convert.ToString(
+                        loginResponse.Result));
+
+                    // get token from loginResult
+                    var handler = new JwtSecurityTokenHandler();
+                    var jwt = handler.ReadJwtToken(loginResult.Token);
+
+                    // create identity and add claims and principal
+                    var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
+                    identity.AddClaim(new Claim(ClaimTypes.Name, jwt.Claims.FirstOrDefault(u=>u.Type=="unique_name").Value));
+                    identity.AddClaim(new Claim(ClaimTypes.Role, jwt.Claims.FirstOrDefault(u => u.Type == "role")?.Value));
+
+                    var principal = new ClaimsPrincipal(identity);
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
+                    // once signed in, retrieve token and store in user session
+                    HttpContext.Session.SetString(SD.SessionToken, loginResult.Token);
+
+                    return RedirectToAction("Index", "Home");
+                }
+
             }
             return View(model);
         }
