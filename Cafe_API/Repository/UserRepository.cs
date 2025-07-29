@@ -18,7 +18,7 @@ namespace Cafe_API.Repository
      * basic CRUD operations like GetUser, CreateUser, UpdatePass... 
      * repo should not hash passwords, validate credentials, generate jwt tokens. 
      * Repos should 'talk to db and return data'.. nothing more.. */
-    public class UserRepository : IUserRepository
+    public class UserRepository : Repository<AppUser>, IUserRepository
     {
         private readonly AppDbContext _db;
         private readonly IMapper _mapper;
@@ -26,7 +26,7 @@ namespace Cafe_API.Repository
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         public UserRepository(AppDbContext db, IMapper mapper, IConfiguration config, UserManager<AppUser> userManager,
-            RoleManager<IdentityRole> roleManager) 
+            RoleManager<IdentityRole> roleManager) : base(db)
         {
             _db = db;
             _mapper = mapper;

@@ -34,5 +34,15 @@ namespace Cafe_Web.Services
                 Data = obj
             });
         }
+
+        public Task<T> GetAllUsers<T>(string token)
+        {
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.GET,
+                Url = cafeUrl +"/api/user/GetUsers",
+                Token = token
+            });
+        }
     }
 }

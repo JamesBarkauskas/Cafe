@@ -1,7 +1,9 @@
-﻿using Cafe_API.Models;
+﻿using AutoMapper;
+using Cafe_API.Models;
 using Cafe_API.Models.Dto;
 using Cafe_API.Repository.IRepository;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 
@@ -12,11 +14,27 @@ namespace Cafe_API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepo;
-        protected APIResponse _response;
-        public UserController(IUserRepository userRepo)
+        protected APIResponse _response;    // consider making _response method-level, not class-lvel...
+        private readonly IMapper _mapper;
+        public UserController(IUserRepository userRepo, IMapper mapper)
         {
             _userRepo = userRepo;
+            _mapper = mapper;
             this._response = new APIResponse();
+        }
+
+        // Retrieve all users for user management..
+        // wil want to create UserDTO to expose only neccesary data like name..
+        // Todo: dont return list of AppUsers(may return extrad data..), instead map to a UserDTO...
+        // so update api to explicityl map to userDTO obj..
+        [HttpGet("GetUsers")]
+        public async Task<ActionResult<APIResponse>> GetUsers()
+        {
+            var users = await _userRepo.GetAllAsync();
+            //List<UserDTO> userDtos = _mapper.Map<UserDTO>(users);
+            _response.Result = users;
+            _response.StatusCode = System.Net.HttpStatusCode.OK;
+            return Ok(_response);
         }
 
         // ** add status codes to both methods **

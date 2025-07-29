@@ -30,7 +30,7 @@ namespace Cafe_Web.Controllers
         public async Task<IActionResult> Index()
         {
             List<Product> productList = new();
-            var response = await _productService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+            var response = await _productService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));  // how to pass in the jwt token..
             if (response != null && response.IsSuccess)
             {
                 productList = JsonConvert.DeserializeObject<List<Product>>(Convert.ToString(response.Result));

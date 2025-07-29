@@ -1,6 +1,7 @@
 ﻿using Cafe_Utility;
 using Cafe_Web.Models;
 using Cafe_Web.Models.Dto;
+using Cafe_Web.Services;
 using Cafe_Web.Services.IServices;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -98,6 +99,7 @@ namespace Cafe_Web.Controllers
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
                     // once signed in, retrieve token and store in user session
+                    // want to store the jwt token into user's session.. allows user to make auth requests..(if admin)
                     HttpContext.Session.SetString(SD.SessionToken, loginResult.Token);
 
                     return RedirectToAction("Index", "Home");
@@ -120,5 +122,18 @@ namespace Cafe_Web.Controllers
         {
             return View();
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUsers()
+        {
+            List<UserDTO> users = new();
+            var response = await _authService.GetAllUsers<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+            if (response != null && response.IsSuccess)
+            {
+                users = JsonConvert.DeserializeObject<List<UserDTO>>(Convert.ToString(response.Result));
+            }
+            return View(users);
+        }
+
     }
 }
