@@ -44,5 +44,15 @@ namespace Cafe_Web.Services
                 Token = token
             });
         }
+
+        public Task<T> GetUser<T>(string id, string token)
+        {
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.GET,
+                Url = cafeUrl + "/api/user?id=" + id,
+                Token = token
+            });
+        }
     }
 }

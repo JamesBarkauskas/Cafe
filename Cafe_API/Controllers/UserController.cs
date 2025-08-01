@@ -48,6 +48,7 @@ namespace Cafe_API.Controllers
                     }
                 }
             }
+
             foreach(var user in users)
             {
                 foreach(var role in roles)
@@ -63,6 +64,19 @@ namespace Cafe_API.Controllers
             _response.Result = users;
             _response.StatusCode = System.Net.HttpStatusCode.OK;
             return Ok(_response);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<APIResponse>> GetUser(string id)
+        {
+            var user = await _userRepo.GetAsync(u=>u.Id == id);
+            if (user != null)
+            {
+                _response.Result = user;
+                _response.StatusCode=System.Net.HttpStatusCode.OK;
+                return Ok(_response);
+            }
+            return BadRequest();
         }
 
         // ** add status codes to both methods **

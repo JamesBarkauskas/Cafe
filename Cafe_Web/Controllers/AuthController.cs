@@ -135,5 +135,17 @@ namespace Cafe_Web.Controllers
             return View(users);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Details(string id)
+        {
+            UserDTO user = new();
+            var response = await _authService.GetUser<APIResponse>(id, HttpContext.Session.GetString(SD.SessionToken));
+            if (response != null && response.IsSuccess)
+            {
+                user = JsonConvert.DeserializeObject<UserDTO>(Convert.ToString(response.Result));
+            }
+            return View(user);
+
+        }
     }
 }

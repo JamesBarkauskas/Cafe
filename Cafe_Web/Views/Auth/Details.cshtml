@@ -1,0 +1,39 @@
+﻿@model UserDTO
+
+<div class="container p-4 border">
+
+    <div class="row pb-2">
+        <div class="col">
+            <h1 class="text-primary">User</h1>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Username
+                </th>
+                <th>
+                    Role
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Email
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@Model.UserName</td>
+                <td>@Model.Role</td>
+                <td>@Model.Name</td>
+                <td>@Model.Email</td>
+            </tr>
+            <a asp-action="GetUsers" class="btn btn-secondary">Back to Users</a>
+        </tbody>
+        
+    </table>
+</div>

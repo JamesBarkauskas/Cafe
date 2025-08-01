@@ -7,5 +7,6 @@ namespace Cafe_Web.Services.IServices
         Task<T> LoginAsync<T>(LoginRequestDTO obj);
         Task<T> RegisterAsync<T>(RegistrationRequestDTO obj);
         Task<T> GetAllUsers<T>(string token);
+        Task<T> GetUser<T>(string id, string token);
     }
 }
