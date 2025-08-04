@@ -54,5 +54,15 @@ namespace Cafe_Web.Services
                 Token = token
             });
         }
+
+        public Task<T> DeleteUser<T>(string id, string token)
+        {
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.DELETE,
+                Url = cafeUrl + "/api/user?id=" + id,
+                Token = token
+            });
+        }
     }
 }

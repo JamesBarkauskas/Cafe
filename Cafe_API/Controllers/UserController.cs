@@ -126,5 +126,21 @@ namespace Cafe_API.Controllers
             _response.Result = user;
             return Ok(_response);
         }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            var user = await _userRepo.GetAsync(u => u.Id == id);
+            if (user == null)
+            {
+                _response.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                _response.IsSuccess = false;
+                _response.Errors.Add("User does not exist by that id");
+                return BadRequest(_response);
+            }
+            await _userRepo.RemoveAsync(user);
+            _response.StatusCode = System.Net.HttpStatusCode.OK;
+            return Ok(_response);
+        }
     }
 }

@@ -145,7 +145,29 @@ namespace Cafe_Web.Controllers
                 user = JsonConvert.DeserializeObject<UserDTO>(Convert.ToString(response.Result));
             }
             return View(user);
+        }
 
+        [HttpGet]
+        public async Task<IActionResult> Delete(string id)
+        {
+            UserDTO user = new();
+            var response = await _authService.GetUser<APIResponse>(id, HttpContext.Session.GetString(SD.SessionToken));
+            if (response !=null && response.IsSuccess)
+            {
+                user = JsonConvert.DeserializeObject<UserDTO>(Convert.ToString(response.Result));
+            }
+            return View(user);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(UserDTO user)
+        {
+            var response = await _authService.DeleteUser<APIResponse>(user.Id, HttpContext.Session.GetString(SD.SessionToken));
+            if (response != null && response.IsSuccess)
+            {
+                return RedirectToAction("GetUsers", "Auth");
+            }
+            return View(user);
         }
     }
 }
